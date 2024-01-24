@@ -68,6 +68,25 @@ async function copyDir(originalPath, copyPath) {
       reject(error);
     }
   });
+
+  //Delete unnecessary files
+  const copyFiles = await fs.promises.readdir(copyPath);
+
+  await new Promise((resolve, reject) => {
+    try {
+      copyFiles.map(async (file) => {
+        const originalFile = path.join(originalPath, file);
+        const copyFile = path.join(copyPath, file);
+
+        if (!(await fs.promises.stat(originalFile).catch(() => null))) {
+          await fs.promises.unlink(copyFile);
+        }
+      });
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 (async () => {

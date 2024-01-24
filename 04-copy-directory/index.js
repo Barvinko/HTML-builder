@@ -20,6 +20,20 @@ async function copyDir(src, dest) {
       }),
     );
 
+    //Delete unnecessary files
+    const destFiles = await fs.readdir(dest);
+    await Promise.all(
+      destFiles.map(async (file) => {
+        const srcFile = path.join(src, file);
+        const destFile = path.join(dest, file);
+
+        // Если файл в dest не существует в src, удаляем его
+        if (!(await fs.stat(srcFile).catch(() => null))) {
+          await fs.unlink(destFile);
+        }
+      }),
+    );
+
     console.log('Folder copied:', src, '->', dest);
   } catch (error) {
     console.error('Error:', error);
